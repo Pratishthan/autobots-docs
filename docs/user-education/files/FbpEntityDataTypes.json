@@ -1,0 +1,63 @@
+{
+  "openapi": "3.0.2",
+  "info": {
+    "title": "Fbp Entity Data Types",
+    "version": "1.0.0",
+    "description": "API Documentation for Fbp Entity Data Types"
+  },
+  "servers": [
+    {
+      "url": "http://10.73.90.52:30080/collection",
+      "description": "Generated server url"
+    },
+    {
+      "url": "http://localhost:9150/collection",
+      "description": "Generated server url"
+    }
+  ],
+  "paths": {},
+  "components": {
+    "schemas": {
+      "CurrencyCode": {
+        "maxLength": 3,
+        "minLength": 3,
+        "pattern": "[A-Z]{3}",
+        "type": "string"
+      },
+      "Amount": {
+        "required": [
+          "currencyCode",
+          "value"
+        ],
+        "type": "object",
+        "properties": {
+          "value": {
+            "format": "double",
+            "description": "Amount value",
+            "maximum": 9.9999999999999E11,
+            "exclusiveMaximum": true,
+            "type": "number"
+          },
+          "currencyCode": {
+            "$ref": "#/components/schemas/CurrencyCode",
+            "description": "Currency code (ISO) for the Amount"
+          }
+        },
+         "x-fbp-params": {
+          "entityDataType": "Amount",
+          "entityPackageName": "com.infosys.fbp.framework.base.vo"
+        }
+      },
+      "BusinessDate": {
+        "format": "date",
+        "description": "Business Date",
+        "type": "string",
+        "example": "2020-10-25",
+        "x-fbp-params": {
+          "entityDataType": "BusinessDate",
+          "entityPackageName": "com.infosys.fbp.model.base.vo"
+        }
+      }
+    }
+  }
+}
