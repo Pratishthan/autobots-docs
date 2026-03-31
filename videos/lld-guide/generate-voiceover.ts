@@ -1,13 +1,9 @@
-import { readFileSync, writeFileSync, mkdirSync, existsSync } from "fs";
+import { readFileSync, mkdirSync, existsSync } from "fs";
 import { join } from "path";
+import { spawnSync } from "child_process";
 
-const ELEVENLABS_API_KEY = process.env.ELEVENLABS_API_KEY;
-if (!ELEVENLABS_API_KEY) {
-  console.error("Set ELEVENLABS_API_KEY environment variable");
-  process.exit(1);
-}
-
-const VOICE_ID = "21m00Tcm4TlvDq8ikWAM"; // Rachel — change to preferred voice
+const EDGE_TTS = "edge-tts";
+const DEFAULT_VOICE = "en-US-AriaNeural";
 
 type SceneScript = {
   id: string;
@@ -21,7 +17,7 @@ function parseScript(filePath: string): SceneScript[] {
   let match;
 
   while ((match = sceneRegex.exec(content)) !== null) {
-    const id = match[1].toLowerCase().replace(/[\s&]+/g, "-");
+    const id = match[1].toLowerCase().replace(/[\s&]+/g, "-").replace(/-+$/, "");
     const narration = match[2].replace(/\n/g, " ").trim();
     scenes.push({ id, narration });
   }
@@ -29,38 +25,25 @@ function parseScript(filePath: string): SceneScript[] {
   return scenes;
 }
 
-async function generateAudio(text: string, outputPath: string): Promise<void> {
-  const response = await fetch(
-    `https://api.elevenlabs.io/v1/text-to-speech/${VOICE_ID}`,
-    {
-      method: "POST",
-      headers: {
-        "xi-api-key": ELEVENLABS_API_KEY!,
-        "Content-Type": "application/json",
-        Accept: "audio/mpeg",
-      },
-      body: JSON.stringify({
-        text,
-        model_id: "eleven_multilingual_v2",
-        voice_settings: {
-          stability: 0.5,
-          similarity_boost: 0.75,
-          style: 0.3,
-        },
-      }),
-    },
+function generateAudio(text: string, outputPath: string): void {
+  // spawnSync with an args array passes each argument directly — no shell escaping needed
+  const result = spawnSync(
+    EDGE_TTS,
+    ["--voice", DEFAULT_VOICE, "--text", text, "--write-media", outputPath],
+    { encoding: "utf-8", maxBuffer: 10 * 1024 * 1024 },
   );
 
-  if (!response.ok) {
-    throw new Error(`ElevenLabs API error: ${response.status} ${await response.text()}`);
+  if (result.error) {
+    throw new Error(`Failed to spawn edge-tts: ${result.error.message}`);
+  }
+  if (result.status !== 0) {
+    throw new Error(`edge-tts exited with code ${result.status}: ${result.stderr}`);
   }
 
-  const audioBuffer = Buffer.from(await response.arrayBuffer());
-  writeFileSync(outputPath, audioBuffer);
   console.log(`  Written: ${outputPath}`);
 }
 
-async function processScript(scriptFile: string, videoId: string): Promise<void> {
+function processScript(scriptFile: string, videoId: string): void {
   const scriptPath = join("src", "scripts", scriptFile);
   const outputDir = join("public", "voiceover", videoId);
 
@@ -81,7 +64,7 @@ async function processScript(scriptFile: string, videoId: string): Promise<void>
       continue;
     }
 
-    await generateAudio(scene.narration, outputPath);
+    generateAudio(scene.narration, outputPath);
   }
 }
 
@@ -104,7 +87,7 @@ const toProcess =
     : scripts.filter(([file]) => existsSync(join("src", "scripts", file)));
 
 for (const [file, id] of toProcess) {
-  await processScript(file, id);
+  processScript(file, id);
 }
 
 console.log("\nDone!");

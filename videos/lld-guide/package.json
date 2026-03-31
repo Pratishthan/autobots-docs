@@ -6,7 +6,7 @@
   "scripts": {
     "studio": "remotion studio",
     "render": "remotion render",
-    "generate-voiceover": "node --strip-types generate-voiceover.ts"
+    "generate-voiceover": "node --experimental-strip-types generate-voiceover.ts"
   },
   "dependencies": {
     "@remotion/cli": "4.0.441",
