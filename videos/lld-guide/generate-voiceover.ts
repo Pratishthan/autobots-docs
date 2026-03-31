@@ -13,11 +13,11 @@ type SceneScript = {
 function parseScript(filePath: string): SceneScript[] {
   const content = readFileSync(filePath, "utf-8");
   const scenes: SceneScript[] = [];
-  const sceneRegex = /## Scene: (\w[\w\s&]*)\s*\(.*?\)\n\[Visual:.*?\]\n"([\s\S]*?)"/g;
+  const sceneRegex = /## Scene: ([^\n(]+?)\s*\(.*?\)\n\[Visual:.*?\]\n"([\s\S]*?)"/g;
   let match;
 
   while ((match = sceneRegex.exec(content)) !== null) {
-    const id = match[1].toLowerCase().replace(/[\s&]+/g, "-").replace(/-+$/, "");
+    const id = match[1].toLowerCase().replace(/[\s&+]+/g, "-").replace(/-+$/, "");
     const narration = match[2].replace(/\n/g, " ").trim();
     scenes.push({ id, narration });
   }
