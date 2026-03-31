@@ -1,0 +1,25 @@
+{
+  "name": "lld-guide",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "studio": "remotion studio",
+    "render": "remotion render",
+    "generate-voiceover": "node --strip-types generate-voiceover.ts"
+  },
+  "dependencies": {
+    "@remotion/cli": "4.0.441",
+    "@remotion/google-fonts": "4.0.441",
+    "@remotion/media": "4.0.441",
+    "@remotion/transitions": "4.0.441",
+    "mediabunny": "^1.40.0",
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0",
+    "remotion": "4.0.441"
+  },
+  "devDependencies": {
+    "@types/react": "^19.0.0",
+    "typescript": "^5.8.0"
+  }
+}
