@@ -1,0 +1,48 @@
+{
+  "schema_version": "1.0",
+  "generated_at": "2026-05-29T00:00:00Z",
+  "component_url_template": "https://kg.example.com/component/{id}",
+  "api_url_template": "https://kg.example.com/api/{id}",
+  "processes": [
+    {
+      "id": "stlc",
+      "label": "STLC Workflow",
+      "title": "Software Testing Life Cycle",
+      "domain": "technical",
+      "category": "SDLC",
+      "summary": "End-to-end software testing flow from requirement intake to sign-off.",
+      "def": "flowchart LR\n  Start_1([Requirement Received]) --> Task_RA[Requirement Analysis]\n  Task_RA --> Task_TP[Test Planning]\n  Task_TP --> Task_TC[Test Case Design]\n  Task_TC --> Task_ENV[Environment Setup]\n  Task_ENV --> Task_EXE[Test Execution]\n  Task_EXE --> Task_CLO[Test Closure]\n  Task_CLO --> End_1([Sign-off])",
+      "steps": {
+        "Start_1": { "mode": "out", "title": "Requirement Received", "role": "Trigger", "desc": "A new feature or change request enters the testing pipeline.", "activities": ["Receive signed-off requirement / user story", "Confirm acceptance criteria are present"], "component": null },
+        "Task_RA": { "mode": "in", "title": "Requirement Analysis", "role": "QA Lead", "desc": "Analyse testability of requirements and identify what can be automated.", "activities": ["Log testability matrix in the test management tool", "Tag requirements with risk level", "Raise clarification tickets where ambiguous"], "component": { "id": "test-rail", "label": "TestRail" } },
+        "Task_TP": { "mode": "in", "title": "Test Planning", "role": "Test Manager", "desc": "Define scope, strategy, effort estimate, and resourcing.", "activities": ["Create Test Plan document", "Estimate effort & assign owners", "Define entry / exit criteria"], "component": { "id": "jira", "label": "Jira" } },
+        "Task_TC": { "mode": "in", "title": "Test Case Design", "role": "QA Engineer", "desc": "Author test cases and scripts, prepare test data.", "activities": ["Write Gherkin / Cucumber scenarios", "Map cases to requirements for traceability", "Prepare and version test data"], "component": { "id": "cucumber", "label": "Cucumber" } },
+        "Task_ENV": { "mode": "out", "title": "Environment Setup", "role": "DevOps", "desc": "Provision and validate the test environment — often manual coordination.", "activities": ["Request / provision test environment", "Deploy build under test", "Smoke-check connectivity to dependencies"], "component": { "id": "ci-pipeline", "label": "CI Pipeline" } },
+        "Task_EXE": { "mode": "in", "title": "Test Execution", "role": "QA Engineer", "desc": "Run test cases, log defects, retest fixes.", "activities": ["Execute manual & automated suites", "Raise defects with repro steps", "Retest and run regression on fixes"], "component": { "id": "jira", "label": "Jira" } },
+        "Task_CLO": { "mode": "in", "title": "Test Closure", "role": "Test Manager", "desc": "Summarise results and capture lessons learned.", "activities": ["Generate test summary report", "Record metrics (pass rate, defect leakage)", "Archive artifacts & conduct retrospective"], "component": { "id": "confluence", "label": "Confluence" } },
+        "End_1": { "mode": "out", "title": "Sign-off", "role": "Stakeholder", "desc": "Business and QA sign off; release proceeds.", "activities": ["Obtain stakeholder approval", "Communicate go / no-go decision"], "component": null }
+      }
+    },
+    {
+      "id": "loan",
+      "label": "Loan Onboarding",
+      "title": "Loan Application Onboarding",
+      "domain": "business",
+      "category": "Lending",
+      "summary": "From application intake through verification, credit decision, and disbursal.",
+      "def": "flowchart LR\n  Start_1([Application Submitted]) --> Task_KYC[KYC & Document Capture]\n  Task_KYC --> Task_VER[Physical Verification]\n  Task_VER --> Task_CR[Credit Assessment]\n  Task_CR --> GW_1{Approved?}\n  GW_1 -->|Yes| Task_SAN[Sanction & Documentation]\n  GW_1 -->|No| Task_REJ[Rejection & Notify]\n  Task_SAN --> Task_DIS[Disbursement]\n  Task_DIS --> End_OK([Onboarded])\n  Task_REJ --> End_NO([Closed - Declined])",
+      "steps": {
+        "Start_1": { "mode": "out", "title": "Application Submitted", "role": "Applicant", "desc": "A prospective borrower submits a loan application through a channel.", "activities": ["Capture applicant intent", "Collect initial application form"], "component": null },
+        "Task_KYC": { "mode": "in", "title": "KYC & Document Capture", "role": "Onboarding Officer", "desc": "Verify identity and collect mandatory documents.", "activities": ["Capture KYC documents", "Run identity & PEP/sanctions checks", "Store documents against customer record"], "component": { "id": "finacle-crm", "label": "Finacle CRM" } },
+        "Task_VER": { "mode": "out", "title": "Physical Verification", "role": "Field Agent", "desc": "Field verification of address / collateral, performed outside the system.", "activities": ["Conduct on-site address verification", "Inspect & photograph collateral", "Submit field report"], "component": { "id": "field-app", "label": "Field App" } },
+        "Task_CR": { "mode": "in", "title": "Credit Assessment", "role": "Credit Analyst", "desc": "Pull bureau data and score the applicant against policy.", "activities": ["Fetch credit bureau report", "Compute eligibility & risk score", "Apply lending policy rules"], "component": { "id": "finacle-loans", "label": "Finacle Loans" } },
+        "GW_1": { "mode": "in", "title": "Approval Decision", "role": "Credit Committee", "desc": "Decision gateway — approve, reject, or refer for manual review.", "activities": ["Evaluate against approval matrix", "Route high-value cases for committee review"], "component": { "id": "finacle-loans", "label": "Finacle Loans" } },
+        "Task_SAN": { "mode": "in", "title": "Sanction & Documentation", "role": "Loan Officer", "desc": "Generate the sanction letter and loan agreement.", "activities": ["Generate sanction letter", "Prepare loan agreement", "Capture borrower acceptance"], "component": { "id": "finacle-loans", "label": "Finacle Loans" } },
+        "Task_DIS": { "mode": "in", "title": "Disbursement", "role": "Operations", "desc": "Create the loan account and disburse funds.", "activities": ["Open loan account", "Disburse to beneficiary account", "Set up repayment schedule"], "component": { "id": "finacle-core", "label": "Finacle Core" } },
+        "Task_REJ": { "mode": "out", "title": "Rejection & Notify", "role": "Onboarding Officer", "desc": "Communicate decline and reason to the applicant.", "activities": ["Record rejection reason", "Notify applicant via channel"], "component": { "id": "portal", "label": "Customer Portal" } },
+        "End_OK": { "mode": "out", "title": "Onboarded", "role": "—", "desc": "Loan is live and the customer is onboarded.", "activities": ["Trigger welcome communication", "Hand off to servicing"], "component": null },
+        "End_NO": { "mode": "out", "title": "Closed (Declined)", "role": "—", "desc": "Application closed without disbursement.", "activities": ["Archive application"], "component": null }
+      }
+    }
+  ]
+}

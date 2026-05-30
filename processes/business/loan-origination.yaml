@@ -1,0 +1,91 @@
+id: loan-origination
+title: Loan Origination
+domain: business
+category: Lending
+summary: End-to-end flow from application intake to disbursal.
+
+actors:
+  - id: applicant
+    name: Applicant
+  - id: underwriter
+    name: Underwriter
+  - id: system
+    name: Loan Platform
+
+steps:
+  - id: submit-application
+    name: Submit Application
+    kind: system
+    actor: applicant
+    trigger: Applicant completes the online form
+    outcome: Application record created
+    description: >
+      The applicant submits personal and financial details through the online
+      portal. The platform validates the payload and persists an application
+      record with a generated identifier.
+    inputs: [Applicant personal details, Income documents]
+    outputs: [Application ID]
+    api_refs:
+      - id: api.loans.applications.create
+        label: Create Application
+        purpose: Persists the application and returns an Application ID
+    next: [credit-gate]
+
+  - id: credit-gate
+    name: Credit Decision
+    kind: decision
+    description: Routes the application based on the automated credit score.
+    branches:
+      - label: "Score >= 700"
+        to: auto-approve
+      - label: "Score < 700"
+        to: verify-documents
+
+  - id: auto-approve
+    name: Auto-Approve
+    kind: system
+    actor: system
+    trigger: Credit score clears the auto-approval threshold
+    outcome: Application marked approved
+    description: High-confidence applications are approved automatically.
+    api_refs:
+      - id: api.loans.applications.approve
+        label: Approve Application
+        purpose: Transitions the application to the approved state
+    next: [disburse]
+
+  - id: verify-documents
+    name: Verify Physical Documents
+    kind: manual
+    actor: underwriter
+    trigger: Application flagged for manual review
+    outcome: Documents verified or rejected
+    description: >
+      An underwriter inspects the submitted physical documents and confirms
+      they match the application. This is an offline step with no system API.
+    next:
+      - to: kyc-check
+        when: Documents valid
+
+  - id: kyc-check
+    name: Run KYC Verification
+    kind: system
+    actor: underwriter
+    description: Hands off to the standalone KYC verification process.
+    process_ref: kyc-verification
+    next: [disburse]
+
+  - id: disburse
+    name: Disburse Funds
+    kind: system
+    actor: system
+    trigger: Application approved and KYC cleared
+    outcome: Funds transferred to the applicant
+    description: The platform initiates the disbursal to the applicant's account.
+    inputs: [Approved Application ID, Disbursal account]
+    outputs: [Disbursal reference]
+    api_refs:
+      - id: api.loans.disbursals.create
+        label: Create Disbursal
+        purpose: Initiates the fund transfer
+    next: []

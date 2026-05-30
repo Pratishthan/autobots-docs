@@ -1,0 +1,153 @@
+/* Business Process Explorer — embedded inside the Material content area.
+   Colors derive from Material's palette vars so it adapts to light/dark;
+   the in/out accents (orange / teal) are explicit to match the design legend. */
+
+.bpx {
+  --bpx-accent: #e8853a;   /* in-system  */
+  --bpx-accent-2: #6fa8a0; /* out-of-system */
+  --bpx-line: var(--md-default-fg-color--lightest, #e0e0e0);
+  --bpx-panel: var(--md-code-bg-color, #f5f5f5);
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  /* Break out of Material's content measure so the graph has room. */
+  margin: 0 calc(50% - 50vw);
+  padding: 0 max(1rem, calc(50vw - 48rem));
+}
+
+.bpx-switcher {
+  display: inline-flex;
+  gap: 6px;
+  padding: 5px;
+  border: 1px solid var(--bpx-line);
+  border-radius: 12px;
+  background: var(--bpx-panel);
+  align-self: flex-start;
+}
+.bpx-switcher button {
+  font: inherit;
+  font-size: 0.8rem;
+  font-weight: 500;
+  color: var(--md-default-fg-color--light, #666);
+  background: transparent;
+  border: 0;
+  padding: 8px 16px;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background 0.18s, color 0.18s;
+  white-space: nowrap;
+}
+.bpx-switcher button:hover { color: var(--md-default-fg-color, #111); }
+.bpx-switcher button.active {
+  background: var(--bpx-accent);
+  color: #fff;
+}
+
+.bpx-body {
+  display: flex;
+  gap: 16px;
+  min-height: 60vh;
+  border: 1px solid var(--bpx-line);
+  border-radius: 14px;
+  overflow: hidden;
+}
+
+.bpx-canvas {
+  position: relative;
+  flex: 1;
+  min-width: 0;
+  overflow: auto;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+}
+.bpx-canvas svg { max-width: 100%; height: auto; }
+
+.bpx-legend {
+  position: absolute;
+  left: 14px;
+  bottom: 14px;
+  display: flex;
+  gap: 16px;
+  font-size: 0.72rem;
+  color: var(--md-default-fg-color--light, #666);
+  background: var(--md-default-bg-color, #fff);
+  border: 1px solid var(--bpx-line);
+  border-radius: 9px;
+  padding: 7px 12px;
+}
+.bpx-legend .dot { display: inline-block; width: 9px; height: 9px; border-radius: 3px; margin-right: 6px; }
+.bpx-legend .in { background: var(--bpx-accent); }
+.bpx-legend .out { background: var(--bpx-accent-2); }
+
+.bpx-panel {
+  width: 340px;
+  flex-shrink: 0;
+  border-left: 1px solid var(--bpx-line);
+  background: var(--bpx-panel);
+  padding: 22px 20px;
+  overflow-y: auto;
+}
+.bpx-panel .hint { color: var(--md-default-fg-color--light, #666); font-size: 0.85rem; line-height: 1.6; }
+
+.bpx-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-family: var(--md-code-font, monospace);
+  font-size: 0.66rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  padding: 4px 10px;
+  border-radius: 999px;
+  margin-bottom: 12px;
+}
+.bpx-tag.in  { color: var(--bpx-accent);   background: #e8853a1a; border: 1px solid #e8853a55; }
+.bpx-tag.out { color: var(--bpx-accent-2); background: #6fa8a01a; border: 1px solid #6fa8a055; }
+
+.bpx-panel h3 { margin: 0 0 4px; font-size: 1.25rem; }
+.bpx-panel .role { color: var(--bpx-accent); font-weight: 600; font-size: 0.82rem; margin: 0 0 16px; }
+.bpx-panel.out-mode .role { color: var(--bpx-accent-2); }
+.bpx-seclabel {
+  font-family: var(--md-code-font, monospace);
+  font-size: 0.66rem; text-transform: uppercase; letter-spacing: 0.1em;
+  color: var(--md-default-fg-color--light, #888);
+  margin: 18px 0 8px;
+}
+.bpx-panel p.desc { font-size: 0.88rem; line-height: 1.6; margin: 0; }
+ul.bpx-actions { list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 7px; }
+ul.bpx-actions li {
+  font-size: 0.82rem; line-height: 1.45;
+  padding: 10px 12px;
+  background: var(--md-default-bg-color, #fff);
+  border: 1px solid var(--bpx-line);
+  border-radius: 8px;
+  border-left: 3px solid var(--bpx-accent);
+}
+.bpx-panel.out-mode ul.bpx-actions li { border-left-color: var(--bpx-accent-2); }
+.bpx-chip {
+  display: inline-block;
+  font-family: var(--md-code-font, monospace);
+  font-size: 0.72rem;
+  padding: 4px 9px;
+  border-radius: 7px;
+  border: 1px solid var(--bpx-line);
+  background: var(--md-default-bg-color, #fff);
+  margin-top: 14px;
+  text-decoration: none;
+  color: var(--md-default-fg-color, #111);
+}
+a.bpx-chip:hover { border-color: var(--bpx-accent); }
+
+/* node affordance */
+.bpx-canvas .node.clickable { cursor: pointer; }
+.bpx-canvas .node.clickable:hover { filter: brightness(1.12); }
+.bpx-canvas .node.sel rect,
+.bpx-canvas .node.sel polygon,
+.bpx-canvas .node.sel circle { stroke-width: 3.5px !important; }
+
+@media (max-width: 760px) {
+  .bpx-body { flex-direction: column; }
+  .bpx-panel { width: auto; border-left: 0; border-top: 1px solid var(--bpx-line); }
+}
