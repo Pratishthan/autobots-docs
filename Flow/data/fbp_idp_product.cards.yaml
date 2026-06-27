@@ -6,6 +6,10 @@
 # Graph Server, AMA, Component Docs and the two BRDs are INFERRED from the hand-drawn
 # pipeline — fact-check owner/team/sla before relying on them.
 #
+# documents:/links: URLs are PLACEHOLDER (*.fbp.internal, demo run IDP-7042) — same style
+# as the loan flow; swap in real artifact/wiki URLs when available. documents = artifacts
+# this step produces (rendered as tappable chips); links = reference material.
+#
 # Layout: every node is pinned via pos: on a doubled column grid (0,2,4,…) so an empty
 # column sits between each step — widens horizontal spacing for this flow only, without
 # touching the global COLW in layout.js. col is the grid column (× COLW px), lane is the row.
@@ -30,6 +34,14 @@ cards:
       - "Capture the business need"
       - "Frame the problem & outcome"
       - "Hand to a business analyst"
+    documents:
+      - name: "Idea Brief"
+        format: "PDF"
+        status: "Captured"
+        link: "https://vault.fbp.internal/idp/IDP-7042/idea-brief"
+    links:
+      - label: "Product intake guide"
+        url: "https://wiki.fbp.internal/idp/intake-guide"
 
   brd_business:
     pos: { col: 2, lane: 0 }
@@ -45,6 +57,14 @@ cards:
       - "Elaborate requirements with stakeholders"
       - "Define scope & acceptance criteria"
       - "Sign off the BRD"
+    documents:
+      - name: "Business BRD"
+        format: "PDF"
+        status: "Signed off"
+        link: "https://vault.fbp.internal/idp/IDP-7042/business-brd"
+    links:
+      - label: "BRD authoring template"
+        url: "https://wiki.fbp.internal/idp/templates/brd"
 
   solution_mapper:
     pos: { col: 4, lane: 0 }
@@ -61,6 +81,18 @@ cards:
       - "Decompose requirements into capabilities"
       - "Map capabilities to FBP services/components"
       - "Produce the solution map"
+    documents:
+      - name: "Solution Map"
+        format: "PDF"
+        status: "Generated"
+        link: "https://vault.fbp.internal/idp/IDP-7042/solution-map"
+      - name: "Candidate Component List"
+        format: "JSON"
+        status: "Generated"
+        link: "https://vault.fbp.internal/idp/IDP-7042/candidate-components"
+    links:
+      - label: "Solution mapping playbook"
+        url: "https://wiki.fbp.internal/idp/solution-mapping"
 
   component_idea:
     pos: { col: 0, lane: 1 }
@@ -76,6 +108,11 @@ cards:
       - "Identify the component need"
       - "Outline its responsibility"
       - "Hand to component requirements"
+    documents:
+      - name: "Component Idea Brief"
+        format: "PDF"
+        status: "Captured"
+        link: "https://vault.fbp.internal/idp/IDP-7042/component-idea-brief"
 
   brd_component:
     pos: { col: 6, lane: 0 }
@@ -92,6 +129,14 @@ cards:
       - "Scope the component"
       - "Capture interfaces & behaviours"
       - "Sign off the component BRD"
+    documents:
+      - name: "Component BRD"
+        format: "PDF"
+        status: "Signed off"
+        link: "https://vault.fbp.internal/idp/IDP-7042/component-brd"
+    links:
+      - label: "Component BRD template"
+        url: "https://wiki.fbp.internal/idp/templates/component-brd"
 
   slicer:
     pos: { col: 8, lane: 0 }
@@ -107,6 +152,14 @@ cards:
       - "Break the BRD into slices"
       - "Order & size the slices"
       - "Queue for design"
+    documents:
+      - name: "Component Slice Plan"
+        format: "PDF"
+        status: "Generated"
+        link: "https://vault.fbp.internal/idp/IDP-7042/slice-plan"
+    links:
+      - label: "Slicing guidelines"
+        url: "https://wiki.fbp.internal/idp/slicing-guide"
 
   designer:
     pos: { col: 10, lane: 0 }
@@ -123,6 +176,16 @@ cards:
       - "Discuss the feature with the team"
       - "Capture data models & behaviours"
       - "Produce the LLD document"
+    documents:
+      - name: "Low-Level Design (LLD)"
+        format: "Markdown"
+        status: "Authored"
+        link: "https://vault.fbp.internal/idp/IDP-7042/lld"
+    links:
+      - label: "LLD template"
+        url: "https://wiki.fbp.internal/idp/templates/lld"
+      - label: "Designer domain guide"
+        url: "https://wiki.fbp.internal/idp/designer"
 
   nurture:
     pos: { col: 12, lane: 0 }
@@ -140,6 +203,22 @@ cards:
       - "Extract data models, behaviours & scenarios"
       - "Generate code, specs & tests"
       - "Emit production-ready artifacts"
+    documents:
+      - name: "Generated Code Bundle"
+        format: "ZIP"
+        status: "Generated"
+        link: "https://vault.fbp.internal/idp/IDP-7042/code-bundle"
+      - name: "OpenAPI Specification"
+        format: "YAML"
+        status: "Generated"
+        link: "https://vault.fbp.internal/idp/IDP-7042/openapi"
+      - name: "Gherkin Test Suite"
+        format: "Feature"
+        status: "Generated"
+        link: "https://vault.fbp.internal/idp/IDP-7042/gherkin-tests"
+    links:
+      - label: "Nurture pipeline reference"
+        url: "https://wiki.fbp.internal/idp/nurture"
 
   kbe:
     pos: { col: 14, lane: 0 }
@@ -157,6 +236,14 @@ cards:
       - "Parse generated artifacts"
       - "Extract entities & relationships"
       - "Publish to the graph"
+    documents:
+      - name: "Knowledge Extract"
+        format: "JSON"
+        status: "Published"
+        link: "https://vault.fbp.internal/idp/IDP-7042/knowledge-extract"
+    links:
+      - label: "KBE extraction guide"
+        url: "https://wiki.fbp.internal/idp/kbe"
 
   graph_server:
     pos: { col: 16, lane: 0 }
@@ -172,6 +259,14 @@ cards:
       - "Ingest extracted knowledge"
       - "Index entities & relationships"
       - "Serve graph queries"
+    documents:
+      - name: "Knowledge Graph Snapshot"
+        format: "JSON"
+        status: "Live"
+        link: "https://vault.fbp.internal/idp/IDP-7042/graph-snapshot"
+    links:
+      - label: "Graph Server API reference"
+        url: "https://wiki.fbp.internal/idp/graph-server/api"
 
   ama:
     pos: { col: 18, lane: 0 }
@@ -188,6 +283,9 @@ cards:
       - "Interpret the question"
       - "Query the knowledge graph"
       - "Answer with citations"
+    links:
+      - label: "Ask-Me-Anything usage guide"
+        url: "https://wiki.fbp.internal/idp/ama"
 
   dexter:
     pos: { col: 18, lane: 1 }
@@ -205,6 +303,18 @@ cards:
       - "Interpret the request (generate vs validate)"
       - "Ground against the service catalog / graph"
       - "Emit config or validation report"
+    documents:
+      - name: "Service-Extensibility Config"
+        format: "JSON"
+        status: "Generated"
+        link: "https://vault.fbp.internal/idp/IDP-7042/extensibility-config"
+      - name: "Validation Report"
+        format: "JSON"
+        status: "Generated"
+        link: "https://vault.fbp.internal/idp/IDP-7042/validation-report"
+    links:
+      - label: "Dexter extensibility guide"
+        url: "https://wiki.fbp.internal/idp/dexter"
 
   comp_doc:
     pos: { col: 18, lane: 2 }
@@ -220,3 +330,11 @@ cards:
       - "Pull component knowledge from the graph"
       - "Render documentation"
       - "Publish for consumers"
+    documents:
+      - name: "Component Documentation"
+        format: "HTML"
+        status: "Published"
+        link: "https://vault.fbp.internal/idp/IDP-7042/component-docs"
+    links:
+      - label: "Docs portal"
+        url: "https://wiki.fbp.internal/idp/docs-portal"
