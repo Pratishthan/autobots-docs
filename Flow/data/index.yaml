@@ -1,0 +1,16 @@
+# Flow registry — drives the left navigator (search · groups · hierarchy).
+# Each entry maps to data/<id>.flow.mmd + data/<id>.cards.yaml.
+#   group:    optional section header in the navigator.
+#   children: optional sub-flows. Each child needs its own data files;
+#             nest them here and they appear indented under the parent.
+#             (Ready for the parent → sub-flow drill-down work.)
+flows:
+  - id: loan
+    group: Lending
+    children:
+      - id: loan_kyc
+        children:
+          - id: loan_kyc_sanctions
+      - id: loan_underwriting
+  - id: feature
+    group: Product Delivery

@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Flow — Interactive Process Map</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet" />
+
+<!-- Import map: lets the live @chainlit/react-client adapter (chat-agent.jsx) pull
+     the client from esm.sh while SHARING this page's single React instance via the
+     ./react-*-shim.js modules. Inert until window.FLOW_AGENT enables live mode. -->
+<script type="importmap">
+{
+  "imports": {
+    "react": "./react-shim.js",
+    "react-dom": "./react-dom-shim.js",
+    "react-dom/client": "./react-dom-shim.js",
+    "react/jsx-runtime": "./react-jsx-runtime-shim.js",
+    "react/jsx-dev-runtime": "./react-jsx-runtime-shim.js",
+    "recoil": "https://esm.sh/recoil@0.7.7?external=react,react-dom",
+    "@chainlit/react-client": "https://esm.sh/@chainlit/react-client?external=react,react-dom,recoil"
+  }
+}
+</script>
+<style>
+  :root {
+    --sans: "Space Grotesk", system-ui, -apple-system, sans-serif;
+    --mono: "JetBrains Mono", ui-monospace, monospace;
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; height: 100%; overflow: hidden; background: #0b0e15; }
+  #root { position: absolute; inset: 0; }
+  button { font-family: var(--sans); }
+  ::-webkit-scrollbar { width: 10px; height: 10px; }
+  ::-webkit-scrollbar-thumb { background: rgba(255,255,255,.14); border-radius: 6px; border: 2px solid transparent; background-clip: padding-box; }
+  ::-webkit-scrollbar-thumb:hover { background: rgba(255,255,255,.24); background-clip: padding-box; }
+  ::-webkit-scrollbar-track { background: transparent; }
+
+  /* ---- diagram animations ---- */
+  @keyframes flowDash { to { stroke-dashoffset: -32; } }
+  @keyframes nodeIn {
+    from { opacity: 0; transform: translateY(16px) scale(.965); }
+    to   { opacity: 1; transform: none; }
+  }
+  @keyframes selRing {
+    0%   { opacity: .55; transform: scale(1); }
+    70%  { opacity: 0;   transform: scale(1.08); }
+    100% { opacity: 0;   transform: scale(1.08); }
+  }
+  @keyframes chatDot {
+    0%, 60%, 100% { opacity: .25; transform: translateY(0); }
+    30%           { opacity: 1;   transform: translateY(-3px); }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .flow-dash, .sel-ring { animation: none !important; }
+    .node-enter { animation: none !important; }
+  }
+</style>
+</head>
+<body>
+<div id="root"></div>
+
+<script src="https://unpkg.com/react@18.3.1/umd/react.development.js" integrity="sha384-hD6/rw4ppMLGNu3tX5cjIb+uRZ7UkRJ6BPkLpg4hAu/6onKUg4lLsHAs9EBPT82L" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" integrity="sha384-u6aeetuaXnQ38mYT8rp6sbXaQe3NL9t+IBXmnYxwkUI2Hw4bsp2Wvmx4yRQF1uAm" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" integrity="sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y" crossorigin="anonymous"></script>
+
+<!-- Live config: set BEFORE flow-loader.js + the app mount. The data loader
+     reads .server/.mode to fetch flows from the backend (single source of
+     truth); chat-agent.jsx reads the same object to drive the chat drawer.
+     A live backend is REQUIRED for flows (the canvas no longer parses static
+     files in-browser); chat still falls back to a built-in mock if unreachable.
+     Backend: ./backend/README.md. -->
+<script>
+  window.FLOW_AGENT = {
+    mode: "chainlit",                 // "mock" | "chainlit" | "auto"
+    server: "http://localhost:8000",  // your Chainlit + /api/flows server origin
+    clientType: "webapp",             // custom frontend, not Chainlit's UI
+    // accessToken: undefined,        // JWT, only if Chainlit auth is enabled
+  };
+</script>
+
+<!-- data: backend /api/flows (flow_store.py); a live backend is required -->
+<script src="flow-loader.js"></script>
+<script src="layout.js"></script>
+
+<!-- UI (JSX) -->
+<script type="text/babel" src="tweaks-panel.jsx"></script>
+<script type="text/babel" src="flow-sidebar.jsx"></script>
+<script type="text/babel" src="nodes.jsx"></script>
+<script type="text/babel" src="panel.jsx"></script>
+<script type="text/babel" src="chat-panel.jsx"></script>
+<script type="text/babel" src="chat-agent.jsx"></script>
+<script type="text/babel" src="app.jsx"></script>
+</body>
+</html>

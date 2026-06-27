@@ -2,3 +2,7 @@
 .obsidian/*
 .worktrees/
 .DS_Store
+Flow/backend/.venv
+Flow/backend/.env
+Flow/backend/__pycache__
+Flow/backend/.chainlit
