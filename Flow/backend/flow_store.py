@@ -154,7 +154,8 @@ def _parse_mmd(path: str) -> tuple[dict[str, Node], list[Edge]]:
             s = raw.strip()
             if not s or s.startswith("%%"):
                 continue
-            if re.match(r"^(flowchart|graph|classDef|linkStyle|class |subgraph|end$|direction)", s):
+            # \b so node ids that merely start with a keyword (e.g. graph_server) aren't skipped
+            if re.match(r"^(flowchart|graph|classDef|linkStyle|class|subgraph|end|direction)\b", s):
                 continue
             # edges first (they also contain ids that would confuse the node regex)
             edge = _match_edge(s)

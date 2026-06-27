@@ -1,0 +1,37 @@
+%% FBP-IDP Product Flow — idea-to-knowledge product pipeline (hand-drawn "Product Pipeline").
+%% Topology only. Card content + grid position live in fbp_idp_product.cards.yaml (keyed by node id).
+flowchart LR
+
+  business_idea(["Business Idea"]):::start
+  brd_business[/"Business BRD"/]:::manual
+  solution_mapper["Solution Mapper"]:::system
+  component_idea(["Component Idea"]):::start
+  brd_component[/"Component BRD"/]:::manual
+  slicer["Slicer"]:::system
+  designer["Designer"]:::system
+  nurture["Nurture"]:::system
+  kbe["KBE"]:::system
+  graph_server["Graph Server"]:::system
+  ama(["AMA — Ask-Me-Anything"]):::end
+  dexter["Dexter"]:::system
+  comp_doc["Component Docs"]:::system
+
+  business_idea -->|Captured| brd_business
+  brd_business --> solution_mapper
+  solution_mapper -->|Solution shape| brd_component
+  component_idea -->|Captured| brd_component
+  brd_component --> slicer
+  slicer -->|Component slices| designer
+  designer -->|LLD| nurture
+  nurture -->|Code & specs| kbe
+  kbe -->|Extracted knowledge| graph_server
+  graph_server --> ama
+  graph_server --> dexter
+  graph_server --> comp_doc
+
+  classDef system fill:#151a26,stroke:#34d8f0,stroke-width:1.5px,color:#eef2fb;
+  classDef manual fill:#151a26,stroke:#f5c451,stroke-width:1.5px,color:#eef2fb;
+  classDef decision fill:#151a26,stroke:#c98bff,stroke-width:1.5px,color:#eef2fb;
+  classDef start fill:#0b0e15,stroke:#5fe3a1,stroke-width:1.5px,color:#eef2fb;
+  classDef end fill:#0b0e15,stroke:#5fe3a1,stroke-width:1.5px,color:#eef2fb;
+  classDef declined fill:#0b0e15,stroke:#ff6f6f,stroke-width:1.5px,color:#eef2fb;

@@ -1,0 +1,222 @@
+# FBP-IDP Product Flow — card content. Keys link to node ids in fbp_idp_product.flow.mmd.
+#
+# Grounding note: Designer + Nurture (autobots-agents-mer), KBE (autobots-agents-pay)
+# and Dexter (FBP Extensibility Assistant — see docs/training/capstone-brief-dexter.md)
+# are real components and their cards reflect the actual repos. Solution Mapper, Slicer,
+# Graph Server, AMA, Component Docs and the two BRDs are INFERRED from the hand-drawn
+# pipeline — fact-check owner/team/sla before relying on them.
+#
+# Layout: every node is pinned via pos: on a doubled column grid (0,2,4,…) so an empty
+# column sits between each step — widens horizontal spacing for this flow only, without
+# touching the global COLW in layout.js. col is the grid column (× COLW px), lane is the row.
+
+flow:
+  id: "fbp_idp_product"
+  name: "FBP-IDP Product Flow"
+  subtitle: "Idea to knowledge — BRD through code generation to a graph-grounded assistant"
+
+cards:
+  business_idea:
+    pos: { col: 0, lane: 0 }
+    owner: "Product Management"
+    team: "Business"
+    sla: "—"
+    desc: "A new business capability or product idea enters the IDP pipeline. The starting point for solution-level work."
+    inputs:
+      - "Market / stakeholder need"
+    outputs:
+      - "Idea brief"
+    steps:
+      - "Capture the business need"
+      - "Frame the problem & outcome"
+      - "Hand to a business analyst"
+
+  brd_business:
+    pos: { col: 2, lane: 0 }
+    owner: "Business Analyst"
+    team: "Business"
+    sla: "1–2 weeks"
+    desc: "Business Requirements Document — the human-authored statement of what the product must do, scope and acceptance. (Inferred artifact.)"
+    inputs:
+      - "Idea brief"
+    outputs:
+      - "Business BRD"
+    steps:
+      - "Elaborate requirements with stakeholders"
+      - "Define scope & acceptance criteria"
+      - "Sign off the BRD"
+
+  solution_mapper:
+    pos: { col: 4, lane: 0 }
+    owner: "Solution Mapper"
+    team: "Architecture"
+    sla: "Days"
+    desc: "Maps the business BRD onto a solution shape — the target FBP services, components and integrations that satisfy the requirements. (Inferred component.)"
+    inputs:
+      - "Business BRD"
+    outputs:
+      - "Solution map"
+      - "Candidate components"
+    steps:
+      - "Decompose requirements into capabilities"
+      - "Map capabilities to FBP services/components"
+      - "Produce the solution map"
+
+  component_idea:
+    pos: { col: 0, lane: 1 }
+    owner: "Engineering"
+    team: "Platform"
+    sla: "—"
+    desc: "A component-level idea — a reusable building block — enters the pipeline alongside the business track and feeds the Component BRD."
+    inputs:
+      - "Reuse / capability gap"
+    outputs:
+      - "Component idea brief"
+    steps:
+      - "Identify the component need"
+      - "Outline its responsibility"
+      - "Hand to component requirements"
+
+  brd_component:
+    pos: { col: 6, lane: 0 }
+    owner: "Business Analyst"
+    team: "Platform"
+    sla: "Days"
+    desc: "Component Requirements Document — narrows the solution map and component idea into the concrete requirements for a single component. (Inferred artifact.)"
+    inputs:
+      - "Solution map"
+      - "Component idea brief"
+    outputs:
+      - "Component BRD"
+    steps:
+      - "Scope the component"
+      - "Capture interfaces & behaviours"
+      - "Sign off the component BRD"
+
+  slicer:
+    pos: { col: 8, lane: 0 }
+    owner: "Slicer"
+    team: "Platform"
+    sla: "Hours"
+    desc: "Slices the component BRD into discrete, buildable work items / component slices ready for design. (Inferred component.)"
+    inputs:
+      - "Component BRD"
+    outputs:
+      - "Component slices"
+    steps:
+      - "Break the BRD into slices"
+      - "Order & size the slices"
+      - "Queue for design"
+
+  designer:
+    pos: { col: 10, lane: 0 }
+    owner: "MER Designer"
+    team: "SDLC Automation"
+    sla: "Interactive"
+    desc: "Conversational AI (autobots-agents-mer · Designer domain) that helps teams author a detailed Low-Level Design (LLD) — data models, API behaviours, validation rules and test scenarios."
+    inputs:
+      - "Component slices"
+      - "Feature requirement"
+    outputs:
+      - "Low-Level Design (LLD)"
+    steps:
+      - "Discuss the feature with the team"
+      - "Capture data models & behaviours"
+      - "Produce the LLD document"
+
+  nurture:
+    pos: { col: 12, lane: 0 }
+    owner: "MER Nurture"
+    team: "SDLC Automation"
+    sla: "Minutes"
+    desc: "Production SDLC engine (autobots-agents-mer · Nurture domain) that turns an LLD into a tested microservice: data models → OpenAPI, behaviours → Java, scenarios → Gherkin tests."
+    inputs:
+      - "Low-Level Design (LLD)"
+    outputs:
+      - "Java code"
+      - "OpenAPI specs"
+      - "Gherkin tests"
+    steps:
+      - "Extract data models, behaviours & scenarios"
+      - "Generate code, specs & tests"
+      - "Emit production-ready artifacts"
+
+  kbe:
+    pos: { col: 14, lane: 0 }
+    owner: "Pay KBE"
+    team: "Knowledge"
+    sla: "Minutes"
+    desc: "Knowledge Base Extractor (autobots-agents-pay) — extracts structured knowledge from the generated code and specifications to populate the knowledge graph."
+    inputs:
+      - "Java code"
+      - "OpenAPI specs"
+      - "Gherkin tests"
+    outputs:
+      - "Extracted knowledge entities"
+    steps:
+      - "Parse generated artifacts"
+      - "Extract entities & relationships"
+      - "Publish to the graph"
+
+  graph_server:
+    pos: { col: 16, lane: 0 }
+    owner: "Graph Server"
+    team: "Knowledge"
+    sla: "Live"
+    desc: "Knowledge graph store and API. Holds the extracted product knowledge and serves it to the downstream consumers (AMA, Dexter, Component Docs). (Inferred component.)"
+    inputs:
+      - "Extracted knowledge entities"
+    outputs:
+      - "Knowledge graph API"
+    steps:
+      - "Ingest extracted knowledge"
+      - "Index entities & relationships"
+      - "Serve graph queries"
+
+  ama:
+    pos: { col: 18, lane: 0 }
+    owner: "AMA"
+    team: "Knowledge"
+    sla: "Interactive"
+    desc: "Ask-Me-Anything — a graph-grounded Q&A assistant that answers questions about the product and its components using the knowledge graph. The pipeline's user-facing terminus. (Inferred component.)"
+    inputs:
+      - "Knowledge graph API"
+      - "User question"
+    outputs:
+      - "Grounded answer"
+    steps:
+      - "Interpret the question"
+      - "Query the knowledge graph"
+      - "Answer with citations"
+
+  dexter:
+    pos: { col: 18, lane: 1 }
+    owner: "Dexter"
+    team: "Platform"
+    sla: "Interactive"
+    desc: "FBP Extensibility Assistant — turns a plain-language request into a correct Service-Extensibility config (new columns + validations) and validates existing configs against the live service schema and FBP rules. See docs/training/capstone-brief-dexter.md."
+    inputs:
+      - "Knowledge graph API"
+      - "Extension request or config to validate"
+    outputs:
+      - "Service-Extensibility config"
+      - "Validation report"
+    steps:
+      - "Interpret the request (generate vs validate)"
+      - "Ground against the service catalog / graph"
+      - "Emit config or validation report"
+
+  comp_doc:
+    pos: { col: 18, lane: 2 }
+    owner: "Component Docs"
+    team: "Knowledge"
+    sla: "On demand"
+    desc: "Generated component documentation, assembled from the knowledge graph so docs stay in sync with the produced services. (Inferred component.)"
+    inputs:
+      - "Knowledge graph API"
+    outputs:
+      - "Component documentation"
+    steps:
+      - "Pull component knowledge from the graph"
+      - "Render documentation"
+      - "Publish for consumers"

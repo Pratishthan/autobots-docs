@@ -14,3 +14,5 @@ flows:
       - id: loan_underwriting
   - id: feature
     group: Product Delivery
+  - id: fbp_idp_product
+    group: FBP IDP
