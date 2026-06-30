@@ -1,0 +1,145 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://flow.fbp.internal/schemas/cards.schema.json",
+  "title": "Flow cards file",
+  "description": "Schema for data/<id>.cards.yaml — per-node card content merged onto the Mermaid topology by backend/flow_store.py (_merge_cards). Card keys MUST match node ids declared in the matching <id>.flow.mmd; cards with no matching node are silently dropped. Lenient: unknown keys are allowed (the parser ignores them).",
+  "type": "object",
+  "required": ["cards"],
+  "properties": {
+    "flow": {
+      "type": "object",
+      "description": "Flow-level metadata. Note: `id` here is cosmetic — the real flow id is the filename. `name`/`subtitle` populate the navigator label and header.",
+      "properties": {
+        "id": { "type": "string" },
+        "name": { "type": "string" },
+        "subtitle": { "type": "string" }
+      }
+    },
+    "cards": {
+      "type": "object",
+      "description": "Map keyed by node id. Each key must match an id in <id>.flow.mmd.",
+      "propertyNames": {
+        "pattern": "^[A-Za-z0-9_]+$",
+        "description": "Node id — matches the Mermaid node id regex ([A-Za-z0-9_]+)."
+      },
+      "additionalProperties": { "$ref": "#/$defs/card" }
+    }
+  },
+  "$defs": {
+    "card": {
+      "type": "object",
+      "description": "Content for a single node. Only owner/team/sla/desc/subflow/inputs/outputs/steps/documents/links/pos are read by the parser.",
+      "properties": {
+        "owner": {
+          "type": "string",
+          "description": "Role or system that owns the step (e.g. \"Decision Engine\"). Skipped on null."
+        },
+        "team": {
+          "type": "string",
+          "description": "Owning team (e.g. \"Risk Platform\"). Skipped on null."
+        },
+        "sla": {
+          "type": "string",
+          "description": "Free-text SLA, e.g. \"Instant\", \"< 2 min\", \"2 business days\", \"Interactive\", \"—\". Not an enum."
+        },
+        "desc": {
+          "type": "string",
+          "description": "One/two-sentence description of the step."
+        },
+        "subflow": {
+          "type": "string",
+          "pattern": "^[A-Za-z0-9_]+$",
+          "description": "Id of a child flow to drill into. The child must have its own <id>.flow.mmd / .cards.yaml and be registered under this node's parent `children:` in index.yaml."
+        },
+        "inputs": {
+          "type": "array",
+          "description": "What the step consumes. Ignored if empty.",
+          "items": { "type": "string" }
+        },
+        "outputs": {
+          "type": "array",
+          "description": "What the step produces. Ignored if empty.",
+          "items": { "type": "string" }
+        },
+        "steps": {
+          "type": "array",
+          "description": "Sub-actions inside the step (typically 2-3). Ignored if empty.",
+          "items": { "type": "string" }
+        },
+        "documents": {
+          "type": "array",
+          "description": "Artifacts the step produces, rendered as tappable chips. Each item is a bare string or a {name,format,status,link} object (normalized by _normalize_docs). Always reset from the card (absent = []).",
+          "items": { "$ref": "#/$defs/document" }
+        },
+        "links": {
+          "type": "array",
+          "description": "Reference material. Each item is a bare URL string or a {label,url} object (normalized by _normalize_links). Always reset from the card (absent = []).",
+          "items": { "$ref": "#/$defs/link" }
+        },
+        "pos": { "$ref": "#/$defs/pos" }
+      }
+    },
+    "document": {
+      "description": "Bare name string, or an object. _normalize_docs accepts name|title, format|type, link|url; an item with no resolvable name is dropped.",
+      "oneOf": [
+        { "type": "string" },
+        {
+          "type": "object",
+          "properties": {
+            "name": { "type": "string", "description": "Document name. Alias: title." },
+            "title": { "type": "string", "description": "Alias for name." },
+            "format": {
+              "type": "string",
+              "description": "Free-text format/type, e.g. PDF, JSON, YAML, ZIP, Markdown, Feature, HTML. Alias: type."
+            },
+            "type": { "type": "string", "description": "Alias for format." },
+            "status": {
+              "type": "string",
+              "description": "Free-text status, e.g. Generated, Signed off, Published, Issued."
+            },
+            "link": { "type": "string", "description": "URL to the artifact. Alias: url." },
+            "url": { "type": "string", "description": "Alias for link." }
+          },
+          "anyOf": [
+            { "required": ["name"] },
+            { "required": ["title"] }
+          ]
+        }
+      ]
+    },
+    "link": {
+      "description": "Bare URL string, or an object. _normalize_links accepts label|title|url, url|href; an item with no resolvable url is dropped.",
+      "oneOf": [
+        { "type": "string" },
+        {
+          "type": "object",
+          "properties": {
+            "label": { "type": "string", "description": "Display label. Aliases: title, then url." },
+            "title": { "type": "string", "description": "Alias for label." },
+            "url": { "type": "string", "description": "Target URL. Alias: href." },
+            "href": { "type": "string", "description": "Alias for url." }
+          },
+          "anyOf": [
+            { "required": ["url"] },
+            { "required": ["href"] }
+          ]
+        }
+      ]
+    },
+    "pos": {
+      "type": "object",
+      "description": "Pins the node to the layout grid. Both col and lane are required — a partial pos is ignored and the node is auto-placed by layout.js.",
+      "required": ["col", "lane"],
+      "properties": {
+        "col": {
+          "type": "integer",
+          "description": "Grid column (× COLW px), left-to-right step order. Some flows use doubled even columns (0,2,4,…) to widen spacing."
+        },
+        "lane": {
+          "type": "integer",
+          "description": "Grid row. Convention: 0 = main spine, negative = branch above, positive = branch below (declined/fail terminals on a low lane)."
+        }
+      }
+    }
+  }
+}

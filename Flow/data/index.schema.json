@@ -1,0 +1,59 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://flow.fbp.internal/schemas/index.schema.json",
+  "title": "Flow registry",
+  "description": "Schema for data/index.yaml — the registry that drives the left navigator (order, group headers, sub-flow nesting). Parsed by backend/flow_store.py (_load_index / _registry_entries / _collect_ids). Lenient: unknown keys are allowed.",
+  "type": "object",
+  "anyOf": [
+    { "required": ["flows"] },
+    { "required": ["order"] }
+  ],
+  "properties": {
+    "flows": {
+      "type": "array",
+      "description": "Primary registry. Each entry maps to data/<id>.flow.mmd + <id>.cards.yaml.",
+      "items": { "$ref": "#/$defs/entry" }
+    },
+    "order": {
+      "type": "array",
+      "description": "Fallback registry used only when `flows` is absent: a flat list of flow ids.",
+      "items": { "type": "string", "pattern": "^[A-Za-z0-9_]+$" }
+    }
+  },
+  "$defs": {
+    "entry": {
+      "description": "A registry entry: either a bare flow-id string, or an object.",
+      "oneOf": [
+        {
+          "type": "string",
+          "pattern": "^[A-Za-z0-9_]+$",
+          "description": "Bare flow id."
+        },
+        {
+          "type": "object",
+          "required": ["id"],
+          "properties": {
+            "id": {
+              "type": "string",
+              "pattern": "^[A-Za-z0-9_]+$",
+              "description": "Flow id → data/<id>.flow.mmd + <id>.cards.yaml basename."
+            },
+            "group": {
+              "type": "string",
+              "description": "Optional navigator section header. Entries sharing a group (or all with no group) are bucketed together in order."
+            },
+            "name": {
+              "type": "string",
+              "description": "Optional navigator label, used ONLY as a fallback when the flow file is missing/unparsed; otherwise flow.name from the cards file wins."
+            },
+            "children": {
+              "type": "array",
+              "description": "Optional nested sub-flows, rendered indented under the parent. Recursive — same entry shape, walked to arbitrary depth. Pair with `subflow:` on the parent node's card to enable drill-down.",
+              "items": { "$ref": "#/$defs/entry" }
+            }
+          }
+        }
+      ]
+    }
+  }
+}

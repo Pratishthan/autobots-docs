@@ -1,0 +1,241 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>FBP-IDP — DataItem ontology preview</title>
+<style>
+  :root{
+    --bg:#0b0e15; --panel:#151a26; --line:#223; --text:#eef2fb; --dim:#8aa0c8;
+    --system:#34d8f0; --manual:#f5c451; --terminal:#5fe3a1; --reject:#ff6f6f;
+    --item:#c98bff;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;height:100%;background:var(--bg);color:var(--text);
+    font:14px/1.5 -apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}
+  .wrap{display:grid;grid-template-columns:1fr 320px;grid-template-rows:auto 1fr;height:100vh}
+  header{grid-column:1/3;padding:12px 18px;border-bottom:1px solid var(--line);
+    display:flex;align-items:center;gap:18px;flex-wrap:wrap}
+  header h1{font-size:15px;margin:0;font-weight:600}
+  header .sub{color:var(--dim);font-size:12.5px}
+  .toggle{margin-left:auto;display:flex;gap:0;border:1px solid var(--line);border-radius:8px;overflow:hidden}
+  .toggle button{background:transparent;color:var(--dim);border:0;padding:7px 13px;cursor:pointer;font-size:12.5px}
+  .toggle button.on{background:var(--panel);color:var(--text)}
+  #cy{width:100%;height:100%}
+  aside{border-left:1px solid var(--line);padding:16px 16px 40px;overflow:auto}
+  aside h2{font-size:12px;text-transform:uppercase;letter-spacing:.06em;color:var(--dim);margin:18px 0 8px}
+  aside h2:first-child{margin-top:0}
+  .legend div{display:flex;align-items:center;gap:9px;margin:6px 0;font-size:12.5px}
+  .swatch{width:18px;height:13px;border-radius:3px;border:1.5px solid;flex:none}
+  .swatch.round{border-radius:9px}
+  .pill{display:inline-block;background:#1c2433;border:1px solid var(--line);border-radius:20px;
+    padding:2px 9px;margin:3px 4px 0 0;font-size:11.5px;color:var(--dim)}
+  .stat{display:flex;justify-content:space-between;border-bottom:1px dashed var(--line);padding:5px 0}
+  .stat b{font-variant-numeric:tabular-nums}
+  .flag{color:var(--manual)}
+  code{background:#1c2433;padding:1px 5px;border-radius:4px;font-size:12px}
+  .err{padding:20px;color:var(--reject)}
+  pre{background:#10141d;border:1px solid var(--line);border-radius:8px;padding:11px;
+    overflow:auto;font-size:11.5px;color:var(--dim);margin:6px 0 0}
+  .note{font-size:12px;color:var(--dim);margin-top:6px}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <div>
+      <h1>FBP-IDP Product Flow — <span style="color:var(--item)">:DataItem</span> ontology preview</h1>
+      <div class="sub">derived from <code>data/fbp_idp_product.cards.yaml</code> · <code>inputs/outputs</code> promoted to nodes</div>
+    </div>
+    <div class="toggle">
+      <button id="btnSteps">Current (steps only)</button>
+      <button id="btnData" class="on">Proposed (with DataItems)</button>
+    </div>
+  </header>
+  <div id="cy"></div>
+  <aside>
+    <h2>How to read this</h2>
+    <div class="legend">
+      <div><span class="swatch" style="border-color:var(--system)"></span> Step · system</div>
+      <div><span class="swatch" style="border-color:var(--manual)"></span> Step · manual</div>
+      <div><span class="swatch" style="border-color:var(--terminal)"></span> Step · terminal</div>
+      <div><span class="swatch round" style="border-color:var(--item);background:#2a2140"></span> :DataItem (internal)</div>
+      <div><span class="swatch round" style="border-color:var(--terminal);background:#16241c;border-style:dashed"></span> :DataItem (external input)</div>
+      <div><span class="swatch round" style="border-color:var(--manual);background:#241f12;border-style:dashed"></span> :DataItem (terminal output)</div>
+    </div>
+    <p class="note">Edges: <code>Step —EMITS→ DataItem —CONSUMES→ Step</code>. Data flows left→right <em>through</em> the item nodes, so shared/forked data becomes visible.</p>
+
+    <h2>What the graph reveals</h2>
+    <div id="stats"></div>
+
+    <h2>Shared data (fan-out)</h2>
+    <div id="shared"></div>
+
+    <h2>External inputs (no producer)</h2>
+    <div id="ext"></div>
+
+    <h2>Terminal outputs (no consumer)</h2>
+    <div id="term"></div>
+
+    <h2>⚑ Potential gap</h2>
+    <div id="dangling"></div>
+
+    <h2>Equivalent card (one step)</h2>
+    <pre id="yaml"></pre>
+  </aside>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/cytoscape/3.30.2/cytoscape.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/dagre/0.8.5/dagre.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/cytoscape-dagre@2.5.0/cytoscape-dagre.min.js"></script>
+<script>
+// ── Transcribed straight from fbp_idp_product.cards.yaml (id, type, inputs, outputs) ──
+// type is taken from the matching .mmd (:::class). DataItems below are DERIVED, not authored —
+// exactly what an exporter would do: dedup inputs/outputs by name into :DataItem nodes.
+const CARDS = {
+  business_idea:  {type:"terminal", label:"Business Idea",   in:["Market / stakeholder need"], out:["Idea brief"]},
+  brd_business:   {type:"manual",   label:"Business BRD",    in:["Idea brief"], out:["Business BRD"]},
+  solution_mapper:{type:"system",   label:"Solution Mapper", in:["Business BRD"], out:["Solution map","Candidate components"]},
+  component_idea: {type:"terminal", label:"Component Idea",  in:["Reuse / capability gap"], out:["Component idea brief"]},
+  brd_component:  {type:"manual",   label:"Component BRD",   in:["Solution map","Component idea brief"], out:["Component BRD"]},
+  slicer:         {type:"system",   label:"Slicer",          in:["Component BRD"], out:["Component slices"]},
+  designer:       {type:"system",   label:"Designer",        in:["Component slices","Feature requirement"], out:["Low-Level Design (LLD)"]},
+  nurture:        {type:"system",   label:"Nurture",         in:["Low-Level Design (LLD)"], out:["Java code","OpenAPI specs","Gherkin tests"]},
+  kbe:            {type:"system",   label:"KBE",             in:["Java code","OpenAPI specs","Gherkin tests"], out:["Extracted knowledge entities"]},
+  graph_server:   {type:"system",   label:"Graph Server",    in:["Extracted knowledge entities"], out:["Knowledge graph API"]},
+  ama:            {type:"terminal", label:"AMA",             in:["Knowledge graph API","User question"], out:["Grounded answer"]},
+  dexter:         {type:"system",   label:"Dexter",          in:["Knowledge graph API","Extension request or config to validate"], out:["Service-Extensibility config","Validation report"]},
+  comp_doc:       {type:"system",   label:"Component Docs",  in:["Knowledge graph API"], out:["Component documentation"]},
+};
+// original .mmd topology (for the "current" view)
+const NEXT = [
+  ["business_idea","brd_business","Captured"],["brd_business","solution_mapper",""],
+  ["solution_mapper","brd_component","Solution shape"],["component_idea","brd_component","Captured"],
+  ["brd_component","slicer",""],["slicer","designer","Component slices"],
+  ["designer","nurture","LLD"],["nurture","kbe","Code & specs"],
+  ["kbe","graph_server","Extracted knowledge"],["graph_server","ama",""],
+  ["graph_server","dexter",""],["graph_server","comp_doc",""],
+];
+
+// ── derive DataItem nodes + producer/consumer edges ──
+const items = {}; // name -> {producers:[], consumers:[]}
+const itemId = n => "di::" + n;
+for (const [sid,c] of Object.entries(CARDS)){
+  for (const o of c.out){ (items[o] ??= {producers:[],consumers:[]}).producers.push(sid); }
+  for (const i of c.in ){ (items[i] ??= {producers:[],consumers:[]}).consumers.push(sid); }
+}
+const classOf = it => !it.producers.length ? "external" : !it.consumers.length ? "terminal" : "internal";
+const hasDownstream = sid => NEXT.some(e => e[0]===sid);
+
+// ── build element sets for both views ──
+function stepNodes(){ return Object.entries(CARDS).map(([id,c]) =>
+  ({data:{id, label:c.label, kind:"step", stype:c.type}})); }
+
+function stepsView(){
+  return [...stepNodes(), ...NEXT.map(([f,t,l]) =>
+    ({data:{id:`n_${f}_${t}`, source:f, target:t, label:l, etype:"next"}}))];
+}
+function dataView(){
+  const els = stepNodes();
+  for (const [name,it] of Object.entries(items)){
+    els.push({data:{id:itemId(name), label:name, kind:"item",
+      iclass:classOf(it), shared:it.consumers.length>1}});
+    it.producers.forEach(p => els.push({data:{id:`e_${p}_${itemId(name)}`,
+      source:p, target:itemId(name), etype:"emits", shared:it.consumers.length>1}}));
+    it.consumers.forEach(co => els.push({data:{id:`e_${itemId(name)}_${co}`,
+      source:itemId(name), target:co, etype:"consumes", shared:it.consumers.length>1}}));
+  }
+  return els;
+}
+
+const STEP_COLOR = {system:"#34d8f0", manual:"#f5c451", terminal:"#5fe3a1"};
+const ITEM_FILL  = {internal:"#2a2140", external:"#16241c", terminal:"#241f12"};
+const ITEM_LINE  = {internal:"#c98bff", external:"#5fe3a1", terminal:"#f5c451"};
+
+let cy;
+function render(view){
+  const els = view==="steps" ? stepsView() : dataView();
+  if (cy) cy.destroy();
+  cy = cytoscape({
+    container: document.getElementById("cy"),
+    elements: els,
+    style: [
+      {selector:"node[kind='step']", style:{
+        "shape":"round-rectangle","background-color":"#151a26",
+        "border-width":2, "border-color":ele=>STEP_COLOR[ele.data("stype")]||"#34d8f0",
+        "label":"data(label)","color":"#eef2fb","text-valign":"center","text-halign":"center",
+        "font-size":12,"font-weight":"600","width":"label","padding":"10px","text-wrap":"wrap","text-max-width":"120px"}},
+      {selector:"node[kind='item']", style:{
+        "shape":"round-rectangle",
+        "background-color":ele=>ITEM_FILL[ele.data("iclass")],
+        "border-width":ele=>ele.data("shared")?2.5:1.5,
+        "border-style":ele=>ele.data("iclass")==="internal"?"solid":"dashed",
+        "border-color":ele=>ele.data("shared")?"#ffffff":ITEM_LINE[ele.data("iclass")],
+        "label":"data(label)","color":"#cdd6ea","text-valign":"center","text-halign":"center",
+        "font-size":10.5,"font-style":"italic","width":"label","padding":"7px",
+        "text-wrap":"wrap","text-max-width":"110px"}},
+      {selector:"edge", style:{
+        "curve-style":"bezier","target-arrow-shape":"triangle","width":1.4,
+        "line-color":"#3a4660","target-arrow-color":"#3a4660",
+        "label":"data(label)","font-size":9.5,"color":"#7d8aa8","text-rotation":"autorotate",
+        "text-background-color":"#0b0e15","text-background-opacity":1,"text-background-padding":2}},
+      {selector:"edge[etype='emits']", style:{"line-color":"#5c6f8f","target-arrow-color":"#5c6f8f"}},
+      {selector:"edge[etype='consumes']", style:{"line-color":"#7a5ca8","target-arrow-color":"#7a5ca8"}},
+      {selector:"edge[?shared]", style:{"line-color":"#cf9bff","target-arrow-color":"#cf9bff","width":2}},
+    ],
+    layout:{name:"dagre", rankDir:"LR", nodeSep:18, rankSep:55, edgeSep:8},
+    wheelSensitivity:0.2,
+  });
+}
+
+document.getElementById("btnSteps").onclick = e=>{toggle("steps",e.target)};
+document.getElementById("btnData").onclick  = e=>{toggle("data",e.target)};
+function toggle(view,btn){
+  document.querySelectorAll(".toggle button").forEach(b=>b.classList.remove("on"));
+  btn.classList.add("on"); render(view);
+}
+
+// ── sidebar analytics ──
+function fill(){
+  const ext=[], term=[], shared=[], dangling=[];
+  for (const [name,it] of Object.entries(items)){
+    const cl=classOf(it);
+    if(cl==="external") ext.push(name);
+    if(cl==="terminal") term.push(name);
+    if(it.consumers.length>1) shared.push(`${name} → ${it.consumers.length}`);
+    if(cl==="terminal" && it.producers.some(hasDownstream)) dangling.push(name);
+  }
+  const pills = a => a.length ? a.map(x=>`<span class="pill">${x}</span>`).join("") : '<span class="note">none</span>';
+  document.getElementById("stats").innerHTML =
+    `<div class="stat">Steps<b>${Object.keys(CARDS).length}</b></div>`+
+    `<div class="stat">:DataItem nodes<b>${Object.keys(items).length}</b></div>`+
+    `<div class="stat">Internal (lineage)<b>${Object.values(items).filter(i=>classOf(i)==='internal').length}</b></div>`+
+    `<div class="stat">Topology edges (current)<b>${NEXT.length}</b></div>`+
+    `<div class="stat">EMITS+CONSUMES edges<b>${Object.values(items).reduce((s,i)=>s+i.producers.length+i.consumers.length,0)}</b></div>`;
+  document.getElementById("shared").innerHTML = pills(shared);
+  document.getElementById("ext").innerHTML = pills(ext);
+  document.getElementById("term").innerHTML = pills(term);
+  document.getElementById("dangling").innerHTML = dangling.length
+    ? pills(dangling) + `<p class="note">Produced mid-pipeline but never consumed — likely a real authoring gap (other terminal outputs are genuine end-products of leaf steps).</p>`
+    : '<span class="note">none</span>';
+  document.getElementById("yaml").textContent =
+`# graph-native shape the DataItem model nudges toward:
+solution_mapper:
+  type: system
+  emits:    [solution_map, candidate_components]   # ids into a DataItem vocab
+  consumes: [business_brd]
+# …vs today's free-text:
+#   outputs: ["Solution map", "Candidate components"]
+#   inputs:  ["Business BRD"]`;
+}
+
+if (window.cytoscape && window.cytoscapeDagre){
+  cytoscape.use(cytoscapeDagre);
+  render("data"); fill();
+} else {
+  document.getElementById("cy").innerHTML =
+    '<div class="err">Could not load Cytoscape from CDN — open this page with an internet connection.</div>';
+}
+</script>
+</body>
+</html>
