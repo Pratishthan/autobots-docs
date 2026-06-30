@@ -138,14 +138,37 @@ cards:
       - label: "Component BRD template"
         url: "https://wiki.fbp.internal/idp/templates/component-brd"
 
-  slicer:
+  bro:
     pos: { col: 5, lane: 0 }
+    owner: "BRO"
+    team: "Platform"
+    sla: "Minutes"
+    desc: "Business Requirements Oracle — takes the component BRD as input and generates a Product Requirements Document (PRD), translating business requirements into a structured, product-shaped specification. (Inferred component.)"
+    inputs:
+      - "Component BRD"
+    outputs:
+      - "Product Requirements Document (PRD)"
+    steps:
+      - "Ingest the component BRD"
+      - "Derive product requirements & acceptance"
+      - "Generate the PRD"
+    documents:
+      - name: "Product Requirements Document (PRD)"
+        format: "PDF"
+        status: "Generated"
+        link: "https://vault.fbp.internal/idp/IDP-7042/prd"
+    links:
+      - label: "PRD authoring template"
+        url: "https://wiki.fbp.internal/idp/templates/prd"
+
+  slicer:
+    pos: { col: 6, lane: 0 }
     owner: "Slicer"
     team: "Platform"
     sla: "Hours"
-    desc: "Slices the component BRD into discrete, buildable work items / component slices ready for design. (Inferred component.)"
+    desc: "Slices the PRD into discrete, buildable work items / component slices ready for design. (Inferred component.)"
     inputs:
-      - "Component BRD"
+      - "Product Requirements Document (PRD)"
     outputs:
       - "Component slices"
     steps:
@@ -162,7 +185,7 @@ cards:
         url: "https://wiki.fbp.internal/idp/slicing-guide"
 
   designer:
-    pos: { col: 7, lane: 0 }
+    pos: { col: 8, lane: 0 }
     owner: "MER Designer"
     team: "SDLC Automation"
     sla: "Interactive"
@@ -188,7 +211,7 @@ cards:
         url: "https://wiki.fbp.internal/idp/designer"
 
   nurture:
-    pos: { col: 8, lane: 0 }
+    pos: { col: 9, lane: 0 }
     owner: "MER Nurture"
     team: "SDLC Automation"
     sla: "Minutes"
@@ -221,7 +244,7 @@ cards:
         url: "https://wiki.fbp.internal/idp/nurture"
 
   kbe:
-    pos: { col: 10, lane: 0 }
+    pos: { col: 11, lane: 0 }
     owner: "Pay KBE"
     team: "Knowledge"
     sla: "Minutes"
@@ -246,7 +269,7 @@ cards:
         url: "https://wiki.fbp.internal/idp/kbe"
 
   graph_server:
-    pos: { col: 12, lane: 0 }
+    pos: { col: 13, lane: 0 }
     owner: "Graph Server"
     team: "Knowledge"
     sla: "Live"
@@ -269,7 +292,7 @@ cards:
         url: "https://wiki.fbp.internal/idp/graph-server/api"
 
   ama:
-    pos: { col: 13, lane: 0 }
+    pos: { col: 14, lane: 0 }
     owner: "AMA"
     team: "Knowledge"
     sla: "Interactive"
@@ -288,7 +311,7 @@ cards:
         url: "https://wiki.fbp.internal/idp/ama"
 
   dexter:
-    pos: { col: 13, lane: 1 }
+    pos: { col: 14, lane: 1 }
     owner: "Dexter"
     team: "Platform"
     sla: "Interactive"
@@ -317,7 +340,7 @@ cards:
         url: "https://wiki.fbp.internal/idp/dexter"
 
   comp_doc:
-    pos: { col: 13, lane: 2 }
+    pos: { col: 14, lane: 2 }
     owner: "Component Docs"
     team: "Knowledge"
     sla: "On demand"

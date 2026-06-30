@@ -125,6 +125,10 @@
       return { ...e, ...geom, fromBox: a, toBox: b };
     }).filter(Boolean);
 
+    // grow the canvas to fit feedback rails that drop below the lowest node
+    const edgeMaxY = edges.reduce((m, e) => Math.max(m, e.maxY || 0), 0);
+    canvas.h = Math.max(canvas.h, edgeMaxY + 120);
+
     return { boxes, edges, canvas, railY };
   }
 
@@ -173,6 +177,26 @@
         const pts = [{ x: a.cx, y: a.y + a.h }, { x: b.cx, y: b.y }];
         return { path: rounded(pts), end: { x: b.cx, y: b.y }, dir: "down", labelPos: { x: a.cx + 14, y: (a.y + a.h + b.y) / 2 } };
       }
+    }
+
+    // Feedback / backward edge: target sits left of source. Drop below the lane
+    // and run leftwards on a dedicated track, then rise into the target's bottom —
+    // keeps it clear of the onward (forward) arrows. Longer spans ride lower so
+    // multiple feedback arcs nest instead of overlapping each other, and the drop
+    // is staggered by span so their vertical legs don't coincide.
+    if (b.col < a.col) {
+      const span = a.col - b.col;
+      const yRail = Math.max(a.y + a.h, b.y + b.h) + 40 + span * 22;
+      const sx = a.cx + (span - 5) * 12;
+      const sy = a.y + a.h;
+      const tx = b.cx, ty = b.y + b.h;
+      const pts = [
+        { x: sx, y: sy },
+        { x: sx, y: yRail },
+        { x: tx, y: yRail },
+        { x: tx, y: ty }
+      ];
+      return { path: rounded(pts), end: { x: tx, y: ty }, dir: "up", maxY: yRail, labelPos: { x: (sx + tx) / 2, y: yRail - 12 } };
     }
 
     // Normal forward edge: exit right, optional Z to reach target lane, enter left.

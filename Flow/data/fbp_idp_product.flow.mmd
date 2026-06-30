@@ -7,6 +7,7 @@ flowchart LR
   solution_mapper["Solution Mapper"]:::system
   component_idea(["Component Idea"]):::start
   brd_component[/"Component BRD"/]:::manual
+  bro["BRO — Business Requirements Oracle"]:::system
   slicer["Slicer"]:::system
   designer["Designer"]:::system
   nurture["Nurture"]:::system
@@ -20,7 +21,8 @@ flowchart LR
   brd_business --> solution_mapper
   solution_mapper -->|Solution shape| brd_component
   component_idea -->|Captured| brd_component
-  brd_component --> slicer
+  brd_component --> bro
+  bro -->|PRD| slicer
   slicer -->|Component slices| designer
   designer -->|LLD| nurture
   nurture -->|Code & specs| kbe
@@ -28,6 +30,9 @@ flowchart LR
   graph_server --> ama
   graph_server --> dexter
   graph_server --> comp_doc
+  graph_server -->|Knowledge feedback| bro
+  graph_server -->|Knowledge feedback| designer
+  graph_server -->|Knowledge feedback| nurture
 
   classDef system fill:#151a26,stroke:#34d8f0,stroke-width:1.5px,color:#eef2fb;
   classDef manual fill:#151a26,stroke:#f5c451,stroke-width:1.5px,color:#eef2fb;
