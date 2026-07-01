@@ -1,5 +1,6 @@
 .vscode/settings.json
 .obsidian/*
+.idea/*
 .worktrees/
 .DS_Store
 Flow/backend/.venv
