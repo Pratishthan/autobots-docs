@@ -1,0 +1,213 @@
+{
+  "openapi": "3.0.2",
+  "info": {
+    "title": "Fbp DTO Data Types",
+    "version": "1.0.0",
+    "description": "API Documentation for Fbp DTO Data Types"
+  },
+  "servers": [
+  ],
+  "paths": {},
+  "components": {
+    "schemas": {
+      "CurrencyCode": {
+        "maxLength": 3,
+        "minLength": 3,
+        "pattern": "[A-Z]{3}",
+        "type": "string"
+      },
+      "AmountDTO": {
+        "required": [
+          "currencyCode",
+          "value"
+        ],
+        "type": "object",
+        "properties": {
+          "value": {
+            "format": "double",
+            "description": "Amount value",
+            "maximum": 9.9999999999999E11,
+            "exclusiveMaximum": true,
+            "type": "number"
+          },
+          "currencyCode": {
+            "$ref": "#/components/schemas/CurrencyCode",
+            "description": "Currency code (ISO) for the Amount"
+          }
+        },
+        "x-fbp-params": {
+          "packageName": "com.infosys.fbp.framework.base.dto",
+          "dataType": "AmountDTO",
+          "entityDataType": "Amount",
+          "entityPackageName": "com.infosys.fbp.framework.base.vo"
+        }
+      },
+      "NullableAmountDTO": {
+        "anyOf": [
+          {
+            "nullable": true
+          },
+          {
+            "$ref": "#/components/schemas/OptionalAmountDTO"
+          }
+        ],
+        "description": "",
+        "type": "object"
+      },
+      "OptionalAmountDTO": {
+        "type": "object",
+        "properties": {
+          "value": {
+            "format": "double",
+            "description": "Amount value",
+            "maximum": 9.9999999999999E11,
+            "exclusiveMaximum": true,
+            "type": "number"
+          },
+          "currencyCode": {
+            "$ref": "#/components/schemas/CurrencyCode",
+            "description": "Currency code (ISO) for the Amount"
+          }
+        },
+        "x-fbp-params": {
+          "packageName": "com.infosys.fbp.framework.base.dto",
+          "dataType": "AmountDTO",
+          "entityDataType": "Amount",
+          "entityPackageName": "com.infosys.fbp.framework.base.vo"
+        }
+      },
+      "BusinessDateDTO": {
+        "format": "date",
+        "description": "Business Date",
+        "type": "string",
+        "example": "2020-10-25",
+        "x-fbp-params": {
+          "packageName": "com.infosys.fbp.model.base.dto",
+          "dataType": "BusinessDateDTO",
+          "entityDataType": "BusinessDate",
+          "entityPackageName": "com.infosys.fbp.model.base.vo"
+        }
+      },
+      "NullableBusinessDateDTO": {
+        "nullable": true,
+        "format": "date",
+        "description": "Business Date",
+        "type": "string",
+        "example": "2020-10-25",
+        "x-fbp-params": {
+          "packageName": "com.infosys.fbp.model.base.dto",
+          "dataType": "BusinessDateDTO",
+          "entityDataType": "BusinessDate",
+          "entityPackageName": "com.infosys.fbp.model.base.vo"
+        }
+      },
+      "FrequencyDTO": {
+        "description": "Frequency DTO",
+        "type": "object",
+        "properties": {
+          "frequencyDerivationMethod": {
+            "enum": [
+              "FIXED_DATE",
+              "ANNIVERSARY_BASED",
+              "NAN"
+            ],
+            "type": "string"
+          },
+          "frequencyPeriods": {
+            "enum": [
+              "EVERY_N_DAYS",
+              "DAILY",
+              "WEEKLY",
+              "FORTNIGHTLY",
+              "MONTHLY",
+              "QUARTERLY",
+              "HALF_YEARLY",
+              "YEARLY",
+              "NAN"
+            ],
+            "type": "string"
+          },
+          "startMonth": {
+            "maximum": 11,
+            "type": "integer"
+          },
+          "everyNDay": {
+            "type": "integer"
+          },
+          "monthFrequency": {
+            "$ref": "#/components/schemas/MonthFrequencyDTO"
+          },
+          "onHoliday": {
+            "enum": [
+              "NEXT_DAY",
+              "PREVIOUS_DAY",
+              "SKIP",
+              "NAN"
+            ],
+            "type": "string"
+          },
+          "weeklyFrequency": {
+            "$ref": "#/components/schemas/WeeklyFrequencyDTO",
+            "description": ""
+          }
+        }
+      },
+      "MonthFrequencyDTO": {
+        "description": "Month Frequency DTO",
+        "type": "object",
+        "properties": {
+          "monthMethod": {
+            "type": "string"
+          },
+          "weekFreq": {
+            "nullable": true,
+            "maximum": 5,
+            "type": "integer"
+          },
+          "dayOfWeek": {
+            "nullable": true,
+            "maximum": 6,
+            "type": "integer"
+          },
+          "dateOfMonth": {
+            "nullable": true,
+            "maximum": 31,
+            "minimum": 1,
+            "type": "integer"
+          },
+          "month": {
+            "description": "",
+            "type": "integer"
+          }
+        }
+      },
+      "WeeklyFrequencyDTO": {
+        "description": "",
+        "type": "object",
+        "properties": {
+          "dayOfWeek": {
+            "description": "",
+            "maximum": 6,
+            "minimum": 0,
+            "type": "integer"
+          }
+        }
+      },
+      "FbpName": {
+        "type": "string",
+        "maxLength": 255,
+        "pattern": "^[a-zA-Z0-9_\\- ]+$"
+      },
+      "FbpYesNoFlag": {
+        "type": "string",
+        "maxLength": 1,
+        "pattern": "^[YN]$"
+      },
+      "FbpCodeIdentifier": {
+        "type": "string",
+        "maxLength": 50,
+        "pattern": "^[a-zA-Z0-9_\\-]+$"
+      }
+    }
+  }
+}
